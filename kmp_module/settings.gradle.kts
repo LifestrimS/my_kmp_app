@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
         google()
+        mavenCentral()
+        gradlePluginPortal()
     }
     plugins {
         id("org.jetbrains.kotlin.multiplatform") version "1.9.22"
