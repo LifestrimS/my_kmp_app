@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_kmp_app/utils/cell_type.dart';
 import 'package:my_kmp_app/utils/colors.dart';
 
 import 'kmp_wrapper.dart';
@@ -54,14 +55,17 @@ class _GridCellState extends State<GridCell> {
       case CellType.eight:
       case CellType.nine:
       case CellType.zero:
-        addSymbol();
-      //return '0';
+      case CellType.empty:
+        //addSymbol();
+        changeText(widget.type.symbol);
       case CellType.clearing:
-      //return 'C';
+        clear();
       case CellType.back:
-      //return '<-';
+        deleteLast();
+
       case CellType.percent:
-        addSymbol();
+        //addSymbol();
+        changeText(widget.type.symbol);
       case CellType.division:
         addSymbol();
       case CellType.multiplication:
@@ -73,9 +77,8 @@ class _GridCellState extends State<GridCell> {
       case CellType.comma:
         addSymbol();
       case CellType.equally:
-        addSymbol();
-      case CellType.empty:
-      //return '';
+        //addSymbol();
+        changeText(widget.type.symbol);
     }
   }
 
@@ -86,31 +89,73 @@ class _GridCellState extends State<GridCell> {
     );
     widget.textController.text = test;
   }
-}
 
-enum CellType {
-  one('1'),
-  two('2'),
-  three('3'),
-  fourth('4'),
-  five('5'),
-  six('6'),
-  seven('7'),
-  eight('8'),
-  nine('9'),
-  zero('0'),
-  comma(','),
-  addition('+'),
-  subtraction('-'),
-  multiplication('*'),
-  division('/'),
-  percent('%'),
-  clearing('C'),
-  back('<-'),
-  empty(''),
-  equally('=');
+  void clear() {
+    setState(() {
+      widget.textController.clear();
+    });
+  }
 
-  const CellType(this.symbol);
+  void deleteLast() {
+    setState(() {
+      widget.textController.text = widget.textController.text.replaceRange(
+        widget.textController.text.length - 1,
+        null,
+        '',
+      );
+    });
+  }
 
-  final String symbol;
+  void changeText(String text) async {
+    if (shouldClear() && !isSymbol(text)) {
+      clear();
+    }
+    if (isHasSymbol(text)) return;
+    setState(() {
+      addSymbol();
+    });
+  }
+
+  bool shouldClear() {
+    return widget.textController.text.contains('=') ? true : false;
+  }
+
+  bool isHasSymbol(String text) {
+    if (widget.textController.text.isEmpty && !isSymbol(text)) {
+      return false;
+    }
+    String lastSymbol =
+        widget.textController.text[widget.textController.text.length - 1];
+    if ((widget.textController.text.contains('.') && text == '.') ||
+        isSymbol(lastSymbol) && isSymbol(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  bool isSymbol(String text) {
+    if (text == '+' ||
+        text == '-' ||
+        text == '*' ||
+        text == '/' ||
+        text == '%') {
+      return true;
+    }
+    return false;
+  }
+
+  void equal() {
+    setState(() {
+      final first = widget.textController.text.substring(
+        0,
+        widget.textController.text.indexOf('+'),
+      );
+      final second = widget.textController.text.substring(
+        widget.textController.text.indexOf('+'),
+        null,
+      );
+      widget.textController.text =
+          (double.parse(first) + double.parse(second)).toString();
+    });
+  }
 }

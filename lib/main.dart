@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_kmp_app/utils/cell_type.dart';
 import 'package:my_kmp_app/utils/colors.dart';
 
 import 'cell.dart';
@@ -71,17 +72,8 @@ class _MainScreenState extends State<MainScreen> {
                 GridCell(
                   type: CellType.clearing,
                   textController: _textController,
-                  onTap: () {
-                    clear();
-                  },
                 ),
-                GridCell(
-                  type: CellType.back,
-                  textController: _textController,
-                  onTap: () {
-                    deleteLast();
-                  },
-                ),
+                GridCell(type: CellType.back, textController: _textController),
                 GridCell(
                   type: CellType.percent,
                   textController: _textController,
@@ -118,11 +110,7 @@ class _MainScreenState extends State<MainScreen> {
                   textController: _textController,
                 ),
 
-                GridCell(
-                  type: CellType.empty,
-                  textController: _textController,
-                  onTap: () {},
-                ),
+                GridCell(type: CellType.empty, textController: _textController),
                 GridCell(type: CellType.zero, textController: _textController),
                 GridCell(type: CellType.comma, textController: _textController),
                 GridCell(
@@ -144,76 +132,5 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
-  }
-
-  void addSymbol() async {
-    String test = await KmpWrapper.addText(0, _textController.text);
-    _textController.text = test;
-  }
-
-  void clear() {
-    setState(() {
-      _textController.clear();
-    });
-  }
-
-  void deleteLast() {
-    setState(() {
-      _textController.text = _textController.text.replaceRange(
-        _textController.text.length - 1,
-        null,
-        '',
-      );
-    });
-  }
-
-  void changeText(String text) {
-    if (clearNext && !isSymbol(text)) {
-      clear();
-    }
-    clearNext = false;
-    if (isHasSymbol(text)) return;
-    setState(() {
-      _textController.text += text;
-    });
-  }
-
-  bool isHasSymbol(String text) {
-    if (_textController.text.isEmpty && !isSymbol(text)) {
-      return false;
-    }
-    String lastSymbol = _textController.text[_textController.text.length - 1];
-    if ((_textController.text.contains('.') && text == '.') ||
-        isSymbol(lastSymbol) && isSymbol(text)) {
-      return true;
-    }
-    return false;
-  }
-
-  bool isSymbol(String text) {
-    if (text == '+' ||
-        text == '-' ||
-        text == '*' ||
-        text == '/' ||
-        text == '%') {
-      return true;
-    }
-    return false;
-  }
-
-  void equal() {
-    clearNext = true;
-    setState(() {
-      final first = _textController.text.substring(
-        0,
-        _textController.text.indexOf('+'),
-      );
-      final second = _textController.text.substring(
-        _textController.text.indexOf('+'),
-        null,
-      );
-      _textController.text =
-          (double.parse(first) + double.parse(second)).toString();
-    });
   }
 }
